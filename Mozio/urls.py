@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf.urls import url
 
 # from django.contrib import admin
-from Mozio.views import providers, polygons
+from Mozio.views import providers, polygons, userEndPoints
 
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
@@ -32,6 +32,8 @@ urlpatterns = [
     url(r'^poly/delete/$', polygons.deletePolygons),
     url(r'^poly/update/$', polygons.updatePolygons),
     url(r'^poly/get/$', polygons.getPolygons),
+
+    url(r'^user/search/(\d+\.\d)/(\d+\.\d)$', userEndPoints.searchPolygon),
 
     # url(r'^$', views.hello),
     # url(r'^time/plus/(\d{1,3})/(5)/$', views.hello),
