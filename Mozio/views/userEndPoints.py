@@ -1,4 +1,5 @@
 import json
+import redis
 
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
@@ -6,10 +7,19 @@ from django.views.decorators.http import require_http_methods
 from Mozio.models import Polygons
 from Mozio.views import providers
 
+pool = redis.ConnectionPool(host='localhost', port=6379, db=0)
+r = redis.Redis(connection_pool=pool)
+
 
 @require_http_methods(["GET", "POST"])
 def searchPolygon(request, latitude, longitude):
     # params = request.GET
+
+    key = latitude.join(longitude)
+    redisLookup = r.get(key)
+    if redisLookup is not None:
+        poly = json.loads(r.get(key).decode('ascii'))
+        return JsonResponse(poly)
 
     longitude = float(longitude)
     latitude = float(latitude)
@@ -27,4 +37,5 @@ def searchPolygon(request, latitude, longitude):
         p['providerName'] = provider.name
         polygons['items'].append(p)
 
+    r.set(key, json.dumps(polygons))
     return JsonResponse(polygons)
