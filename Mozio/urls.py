@@ -14,14 +14,27 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
+
 # from django.contrib import admin
-from Mozio import views
+from Mozio.views import providers, polygons
 
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
-    url(r'^hello/$', views.hello),
-    url(r'^$', views.hello),
-    url(r'^time/plus/(\d{1,3})/(5)/$', views.hello),
-    url(r'^provider/plus/(\d{1,3})/(5)/$', views.hello),
+    url(r'^hello/$', providers.hello),
+
+    # Mozio Specific URLS
+    url(r'^provider/add/$', providers.addProvider),
+    url(r'^provider/delete/$', providers.deleteProvider),
+    url(r'^provider/update/$', providers.updateProvider),
+    url(r'^provider/get/$', providers.getProvider),
+
+    url(r'^poly/add/$', polygons.addPolygons),
+    url(r'^poly/delete/$', polygons.deletePolygons),
+    url(r'^poly/update/$', polygons.updatePolygons),
+    url(r'^poly/get/$', polygons.getPolygons),
+
+    # url(r'^$', views.hello),
+    # url(r'^time/plus/(\d{1,3})/(5)/$', views.hello),
+    # url(r'^provider/plus/(\d{1,3})/(5)/$', views.hello),
 
 ]

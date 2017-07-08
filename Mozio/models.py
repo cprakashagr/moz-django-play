@@ -1,13 +1,21 @@
-from django.db import models
+from mongoengine import Document
+from mongoengine import fields
 
 
-class Provider(models.Model):
-    name = models.CharField(max_length=30)
-    email = models.CharField(max_length=25)
-    phoneNumber = models.CharField(max_length=15)
-    language = models.CharField(max_length=2)
-    currency = models.CharField(max_length=3)
+class Provider(Document):
+    name = fields.StringField(verbose_name="name", max_length=25)
+    email = fields.StringField(verbose_name="email", max_length=25)
+    phoneNumber = fields.StringField(verbose_name="phoneNumber", max_length=15)
+    language = fields.StringField(verbose_name="language", max_length=2)
+    currency = fields.StringField(verbose_name="currency", max_length=3)
 
 
-class Polygons(models.Model):
-    area = models.TextField()
+class Polygons(Document):
+    name = fields.StringField(verbose_name="name")
+    price = fields.IntField(verbose_name="price")
+    geometry = fields.PolygonField()
+    providerId = fields.ReferenceField(Provider)
+
+    meta = {
+        'indexes': [[("geometry", "2dsphere"), ("datetime", 1)]]
+    }
