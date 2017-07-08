@@ -1,6 +1,6 @@
 import json
 
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_http_methods
 
 from Mozio import settings
@@ -416,7 +416,11 @@ def updateProvider(request):
     params = request.GET
 
     pId = params['id']
-    provider = fetchProviderWithId(pId)[0]
+    provider = fetchProviderWithId(pId)
+    if len(provider) > 0:
+        provider = provider[0]
+    else:
+        return HttpResponse('False')
     provider.name = params['name'] if 'name' in params else provider['name']
     provider.email = params['email'] if 'email' in params else provider['email']
     provider.phoneNumber = params['phoneNumber'] if 'phoneNumber' in params else provider['phoneNumber']
@@ -432,7 +436,12 @@ def updateProvider(request):
 def getProvider(request):
     params = request.GET
 
-    provider = fetchProviderWithId(params['id'])[0]
+    pId = params['id']
+    provider = fetchProviderWithId(pId)
+    if len(provider) > 0:
+        provider = provider[0]
+    else:
+        return HttpResponse('False')
 
     js = json.loads(provider.to_json())
     return JsonResponse(js)
