@@ -14,7 +14,7 @@ class Polygons(Document):
     name = fields.StringField(verbose_name="name")
     price = fields.IntField(verbose_name="price")
     geometry = fields.PolygonField()
-    providerId = fields.ReferenceField(Provider)
+    providerId = fields.ReferenceField(Provider, reverse_delete_rule=2, required=True)
 
     meta = {
         'indexes': [[("geometry", "2dsphere"), ("datetime", 1)]]

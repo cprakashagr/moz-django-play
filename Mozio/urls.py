@@ -18,12 +18,13 @@ from django.conf.urls import url, include
 # from django.contrib import admin
 from rest_framework import routers
 
-from Mozio.api import ProviderViewSet, PolygonsViewSet
+from Mozio.api import ProviderViewSet, PolygonsViewSet, UserEndPointViewSet
 from Mozio.views import providers, polygons, userEndPoints
 
 router = routers.DefaultRouter()
 router.register(r'api/providers', ProviderViewSet, r'api/providers')
 router.register(r'api/polygons', PolygonsViewSet, r'api/polygons')
+router.register(r'api/userEndPoint/(\d+\.\d)/(\d+\.\d)', UserEndPointViewSet, r'api/userEndPoint')
 
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
