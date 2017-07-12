@@ -3,8 +3,10 @@ import json
 import redis
 from django.http import JsonResponse
 
-
 # from Mozio.urls import providerRegEx, polygonsRegEx, userEndPointRegEx
+from mongoengine.queryset.visitor import Q
+
+from Mozio.models import Polygons
 
 
 class RedisMiddleWare(object):
@@ -37,6 +39,14 @@ class RedisMiddleWare(object):
         response = self.get_response(request)
         # Add to Redis and return the response
 
+        if request.method == 'POST':
+            if 'api/polygons' in request.path:
+                allLtLnKeys = self.redisLatLong.keys()
+                allLtLnKeys = self.normalizeKeys(allLtLnKeys)
+
+                # TODO: Fix me
+                x = Polygons.objects(Q(id=response.data['id']) & Q(geometry__geo_intersects=[allLtLnKeys]))
+
         if 'api/userEndPoint' in request.path:
             if request.method == 'GET':
                 redisLtLnKey = request.GET['lnlt']
@@ -68,3 +78,10 @@ class RedisMiddleWare(object):
             self.redisLatLong.delete(ltln.decode('ascii'))
         redisRef.delete(pId)
         pass
+
+    def normalizeKeys(self, allLtLnKeys):
+        retList = list()
+        for lnLtKey in allLtLnKeys:
+            lnLtKey = lnLtKey.decode('ascii').split(',')
+            retList.append(lnLtKey)
+        return retList
