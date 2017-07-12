@@ -1,10 +1,10 @@
-#Django Rest Framework
+# **Django Rest Framework**
 
 First application for Django and Rest Framework with MongoDB. To enable faster retrieval, `redis` has been used.
 
 A provider is an identity which provides services around a geo-fenced polygon. The userEndPoint is an API which can find the intersection and return the list of providers who can service.
 
-###Usage
+### **Usage**
 providers:
 ```bash
 GET, POST, PUT, PATCH, DELETE `http://localhost:8000/api/providers/`
@@ -68,7 +68,7 @@ application/json Raw data for Polygons:
     }
 ```
 
-#####TODO
+##### **TODO**
 
 1. For a new polygon entry, modify redis cache
 2. Documentation
