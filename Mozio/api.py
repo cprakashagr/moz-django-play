@@ -54,7 +54,7 @@ class UserEndPointViewSet(ModelViewSet):
     serializer_class = PolygonsFilteredSerailizer
 
     def get_queryset(self):
-        longitude, latitude = self.args
+        longitude, latitude = self.request.GET['lnlt'].split(',')
         longitude = float(longitude)
         latitude = float(latitude)
 
