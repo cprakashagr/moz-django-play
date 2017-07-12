@@ -20,7 +20,7 @@ class PolygonsSerializer(mongoserializers.DocumentSerializer):
 class ProviderFiilteredSerializer(mongoserializers.DocumentSerializer):
     class Meta:
         model = Provider
-        fields = ['name']
+        fields = ['name', 'id']
 
 
 class PolygonsFilteredSerailizer(mongoserializers.DocumentSerializer):
@@ -30,7 +30,7 @@ class PolygonsFilteredSerailizer(mongoserializers.DocumentSerializer):
     class Meta:
         model = Polygons
         depth = 1
-        fields = ["name", "price", "providerId"]
+        fields = ["name", "price", "providerId", 'id']
 
 
 class ProviderViewSet(ModelViewSet):

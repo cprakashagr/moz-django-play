@@ -1,7 +1,7 @@
 import json
-import re
+
 import redis
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 
 
 # from Mozio.urls import providerRegEx, polygonsRegEx, userEndPointRegEx
@@ -18,13 +18,15 @@ class RedisMiddleWare(object):
         poolPolygons = redis.ConnectionPool(host="localhost", port=6379, db=1)
         self.redisPolygons = redis.Redis(connection_pool=poolPolygons)
 
+        poolProviders = redis.ConnectionPool(host="localhost", port=6379, db=2)
+        self.redisProviders = redis.Redis(connection_pool=poolProviders)
+
     def __call__(self, request):
 
         # Check for the existence in the Redis
         # return from here if available
 
         if 'api/userEndPoint' in request.path:
-            print("Matched !")
             if request.method == 'GET':
                 redisLtLnKey = request.GET['lnlt']
                 val = self.redisLatLong.get(redisLtLnKey)
@@ -38,15 +40,51 @@ class RedisMiddleWare(object):
         if 'api/userEndPoint' in request.path:
             if request.method == 'GET':
                 redisLtLnKey = request.GET['lnlt']
-                self.redisLatLong.set(redisLtLnKey, response.content.decode('ascii'))
+                results = json.loads(response.content.decode('ascii'))
 
+                for result in results:
+                    providerId = result['providerId']['id']
+                    polygonId = result['id']
+
+                    fromRedisProvider = self.redisProviders.lrange(providerId, 0, -1)
+                    if fromRedisProvider is not None:
+                        providerList = list()
+                        providerList.extend(fromRedisProvider)
+                        providerList.append(redisLtLnKey.encode)
+                        self.redisProviders.lpush(providerId, *providerList)
+                    else:
+                        self.redisProviders.lpush(providerId, *[redisLtLnKey])
+
+                    fromRedisPolygons = self.redisPolygons.lrange(polygonId, 0, -1)
+                    if fromRedisPolygons is not None:
+                        polygonList = list()
+                        polygonList.extend(fromRedisPolygons)
+                        polygonList.append(redisLtLnKey.encode())
+                        self.redisPolygons.lpush(polygonId, *polygonList)
+                        pass
+                    else:
+                        self.redisPolygons.lpush(polygonId, *[redisLtLnKey])
+
+                self.redisLatLong.set(redisLtLnKey, response.content)
 
         return response
 
     def process_view(self, request, view_func, view_args, view_kwargs):
 
-        if 'api/polygons' in request.path:
-            print("Matched !")
+        if request.method == 'DELETE' or request.method == 'PUT' or request.method == 'PATCH':
+            if 'api/polygons' in request.path:
+                polygonId = view_kwargs['id']
+                self.clearRedis(self.redisPolygons, polygonId)
+            elif 'api/providers' in request.path:
+                providerId = view_kwargs['id']
+                self.clearRedis(self.redisProviders, providerId)
 
-        if 'api/providers' in request.path:
-            print("Matched !")
+    def clearRedis(self, redisRef, pId):
+        ltLnKeys = redisRef.lrange(pId, 0, -1)
+        if ltLnKeys is not None:
+            ltLnList = list()
+            ltLnList.extend(ltLnKeys)
+            for ltln in ltLnList:
+                self.redisLatLong.delete(ltln.decode('ascii'))
+        redisRef.delete(pId)
+        pass
