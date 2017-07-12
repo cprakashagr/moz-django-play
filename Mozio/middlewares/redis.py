@@ -46,6 +46,7 @@ class RedisMiddleWare(object):
 
                 # TODO: Fix me
                 x = Polygons.objects(Q(id=response.data['id']) & Q(geometry__geo_intersects=[allLtLnKeys]))
+                self.redisLatLong.flushall()
 
         if 'api/userEndPoint' in request.path:
             if request.method == 'GET':
