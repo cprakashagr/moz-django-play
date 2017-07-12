@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'mongoengine',
+    "rest_framework_mongoengine",
     'Mozio'
 ]
 

@@ -13,16 +13,24 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+from django.conf.urls import url, include
 
 # from django.contrib import admin
+from rest_framework import routers
+
+from Mozio.api import ProviderViewSet, PolygonsViewSet
 from Mozio.views import providers, polygons, userEndPoints
+
+router = routers.DefaultRouter()
+router.register(r'api/providers', ProviderViewSet, r'api/providers')
+router.register(r'api/polygons', PolygonsViewSet, r'api/polygons')
 
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
     url(r'^hello/$', providers.hello),
 
     # Mozio Specific URLS
+    # Self URLS
     url(r'^provider/add/$', providers.addProvider),
     url(r'^provider/delete/$', providers.deleteProvider),
     url(r'^provider/update/$', providers.updateProvider),
@@ -34,6 +42,10 @@ urlpatterns = [
     url(r'^poly/get/$', polygons.getPolygons),
 
     url(r'^user/search/(\d+\.\d)/(\d+\.\d)$', userEndPoints.searchPolygon),
+
+    url(r'^', include(router.urls)),
+
+    # Mongo Object Id: /^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i
 
     # url(r'^$', views.hello),
     # url(r'^time/plus/(\d{1,3})/(5)/$', views.hello),
