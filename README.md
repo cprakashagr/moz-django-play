@@ -5,6 +5,14 @@ First application for Django and Rest Framework with MongoDB. To enable faster r
 A provider is an identity which provides services around a geo-fenced polygon. The userEndPoint is an API which can find the intersection and return the list of providers who can service.
 
 ### **Usage**
+
+run `django`:
+```bash
+python manage.py runserver 8000
+OR
+gunicorn --access-logfile - --workers 4 --bind=0.0.0.0:8000 Mozio.wsgi:application
+```
+
 providers:
 ```bash
 GET, POST, PUT, PATCH, DELETE `http://localhost:8000/api/providers/`
