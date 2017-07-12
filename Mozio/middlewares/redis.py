@@ -46,25 +46,8 @@ class RedisMiddleWare(object):
                     providerId = result['providerId']['id']
                     polygonId = result['id']
 
-                    fromRedisProvider = self.redisProviders.lrange(providerId, 0, -1)
-                    if fromRedisProvider is not None:
-                        providerList = list()
-                        providerList.extend(fromRedisProvider)
-                        providerList.append(redisLtLnKey.encode)
-                        self.redisProviders.lpush(providerId, *providerList)
-                    else:
-                        self.redisProviders.lpush(providerId, *[redisLtLnKey])
-
-                    fromRedisPolygons = self.redisPolygons.lrange(polygonId, 0, -1)
-                    if fromRedisPolygons is not None:
-                        polygonList = list()
-                        polygonList.extend(fromRedisPolygons)
-                        polygonList.append(redisLtLnKey.encode())
-                        self.redisPolygons.lpush(polygonId, *polygonList)
-                        pass
-                    else:
-                        self.redisPolygons.lpush(polygonId, *[redisLtLnKey])
-
+                    self.redisProviders.lpush(providerId, *[redisLtLnKey])
+                    self.redisPolygons.lpush(polygonId, *[redisLtLnKey])
                 self.redisLatLong.set(redisLtLnKey, response.content)
 
         return response
@@ -81,10 +64,7 @@ class RedisMiddleWare(object):
 
     def clearRedis(self, redisRef, pId):
         ltLnKeys = redisRef.lrange(pId, 0, -1)
-        if ltLnKeys is not None:
-            ltLnList = list()
-            ltLnList.extend(ltLnKeys)
-            for ltln in ltLnList:
-                self.redisLatLong.delete(ltln.decode('ascii'))
+        for ltln in ltLnKeys:
+            self.redisLatLong.delete(ltln.decode('ascii'))
         redisRef.delete(pId)
         pass
